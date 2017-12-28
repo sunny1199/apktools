@@ -18,7 +18,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-require 'apktools/apkxml'
+require 'apkparser/apkxml'
 
 # Parse AndroidManifest.xml from given APK file and write XML data
 # to the given destination

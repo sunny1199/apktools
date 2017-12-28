@@ -17,7 +17,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 require 'zip'
-require 'apktools/apkresources'
+require 'apkparser/apkresources'
 
 ##
 # Class to parse an APK's binary XML format back into textual XML
@@ -112,10 +112,14 @@ class ApkXml
   # Create a new ApkXml instance from the specified +apk_file+
   #
   # This opens and parses the contents of the APK's resources.arsc file.
-  def initialize(apk_file)
+  def initialize(apk_file,xml_data=nil,res=nil)
     @current_apk = apk_file
+    @xml_data = xml_data
+    @apk_resources = res
     Zip.warn_invalid_date = false
-    @apk_resources = ApkResources.new(apk_file)
+    if @apk_resources.nil?
+      @apk_resources = ApkResource.new(apk_file)
+    end
   end #initialize
 
   ##
@@ -127,20 +131,21 @@ class ApkXml
   # resolve_resources: Optionally, where possible, resolve resource references to their default value
   #
   # This opens and parses the contents of the APK's resources.arsc file.
-  def parse_xml(xml_file, pretty = false, resolve_resources = false)
+  def parse_xml(pretty = false, resolve_resources = false)
     # Reset variables
     @xml_elements = Array.new()
     xml_output = ''
     indent = 0
-    data = nil
+    data = @xml_data
 
-    Zip.warn_invalid_date = false
-    Zip::File.foreach(@current_apk) do |f|
-      if f.name.match(xml_file)
-        data = f.get_input_stream.read.force_encoding('BINARY')
+    if data.nil?
+      Zip.warn_invalid_date = false
+      Zip::File.foreach(@current_apk) do |f|
+        if f.name.match(xml_file)
+          data = f.get_input_stream.read.force_encoding('BINARY')
+        end
       end
     end
-
 
     # Parse the Header Chunk
     header = ChunkHeader.new( read_short(data, HEADER_START),
@@ -238,14 +243,14 @@ class ApkXml
               # Use the default resource value
               attr_value = default_res.data
             else
-              key_value = apk_resources.get_resource_key(entry.data, true)
-              if key_value != nil
-                # Use the key string
-                attr_value = key_value
-              else
+              # key_value = apk_resources.get_resource_key(entry.data, true)
+              # if key_value != nil
+              #   # Use the key string
+              #   attr_value = key_value
+              # else
                 #No key found, use raw id marked as a resource
-                attr_value = "res:0x#{entry.data.to_s(16)}"
-              end
+                attr_value = "0x#{entry.data.to_s(16)}"
+              # end
             end
           else # Value is a constant
             attr_value = "0x#{entry.data.to_s(16)}"

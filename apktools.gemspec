@@ -16,19 +16,24 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-Gem::Specification.new do |s|
-  s.name        = 'apktools'
-  s.version     = '0.7.2'
-  s.date        = '2017-04-03'
-  s.summary     = 'APKTools'
-  s.description = 'Library to assist reading resource data out of Android APKs'
-  s.authors     = ['Dave Smith']
-  s.email       = 'smith@wiresareobsolete.com'
-  s.files       = %w(lib/apktools/apkresources.rb lib/apktools/apkxml.rb lib/apktools/resconfiguration.rb)
-  s.homepage    = 'http://github.com/devunwired/apktools'
-  s.license     = 'MIT'
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-  s.executables << 'get_app_version.rb'
-  s.executables << 'read_manifest.rb'
-  s.add_runtime_dependency 'rubyzip', '~> 1.2.1'
+Gem::Specification.new do |spec|
+  spec.name          = "apkparser"
+  spec.version       = "0.8.6"
+  spec.authors       = ["huangxiaodong"]
+  spec.email         = ["sunny_1199@163.com"]
+
+  spec.summary       = "static analysis tool for android apk"
+  spec.description   = "static analysis tool for android apk"
+  spec.homepage      = "https://passport.shine.cn"
+  spec.license       = "MIT"
+
+  spec.executables << 'get_app_version.rb'
+  spec.executables << 'read_manifest.rb'
+
+  spec.files = Dir.glob('lib/**/*.rb') +
+      Dir.glob('ext/**/*.{c,cpp,cxx,hpp,h,rb}')
+  spec.add_runtime_dependency 'rubyzip', '~> 1.2.1'
 end
